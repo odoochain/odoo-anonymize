@@ -14,19 +14,9 @@ class Fields(models.Model):
                 raise ValidationError("Only chars can be anonymized!")
 
     @api.model
-    def _get_excluded_anonymize_models(self):
-        return [
-            'res.config.settings',
-            'ir.property',
-        ]
-
-    @api.model
     def _apply_default_anonymize_fields(self):
         name_fields = {}
-        for dbfield in self.env['ir.model.fields'].search([
-            ('ttype', 'in', ['char', 'text']),
-            ('model_id.model', 'not in', self._get_excluded_anonymize_models())
-        ]):
+        for dbfield in self.env['ir.model.fields'].search([('ttype', 'in', ['char', 'text'])]):
             if any(x in dbfield.name for x in [
                 'phone',
                 'lastname',
@@ -34,7 +24,6 @@ class Fields(models.Model):
                 'city',
                 'zip',
                 'fax',
-                'mobile',
                 'email',
             ]):
                 self.env.cr.execute("update ir_model_fields set anonymize = true where id = %s", (dbfield.id,))
