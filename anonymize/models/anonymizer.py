@@ -43,7 +43,7 @@ class Anonymizer(models.AbstractModel):
     _domains = ["hotmail.com", "gmail.com", "aol.com", "mail.com", "mail.kz", "yahoo.com"]
     
     @api.model
-    def rename_logins(self):
+    def _rename_logins(self):
         self.env.cr.execute("select id, login from res_users where id > 2;")
         for rec in self.env.cr.fetchall():
             login = f"user{rec[0]}"
@@ -97,7 +97,7 @@ class Anonymizer(models.AbstractModel):
         if not force and self.env['ir.config_parameter'].get_param(key=KEY, default='0') == '1':
             return
        
-        self._rename_logins()
+        self._rename_login()
 
         self._delete_critical_tables()
         self._delete_mail_tracking_values()
