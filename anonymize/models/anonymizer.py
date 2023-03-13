@@ -41,7 +41,15 @@ def tabletype(cr, tablename):
 class Anonymizer(models.AbstractModel):
     _name = 'frameworktools.anonymizer'
     _domains = ["hotmail.com", "gmail.com", "aol.com", "mail.com", "mail.kz", "yahoo.com"]
-
+    
+    @api.model
+    def rename_logins(self):
+        self.env.cr.execute("select id, login from res_users where id > 2;")
+        for rec in self.env.cr.fetchall():
+            login = f"user{rec[0]}"
+            self.env.cr.execute(
+                "update res_users set login = %s where id=%s", (login, rec[0])
+            )
     @api.model
     def gen_phone(self):
         first = str(random.randint(00000, 99999))
@@ -88,6 +96,8 @@ class Anonymizer(models.AbstractModel):
         KEY = 'db.anonymized'
         if not force and self.env['ir.config_parameter'].get_param(key=KEY, default='0') == '1':
             return
+       
+        self._rename_logins()
 
         self._delete_critical_tables()
         self._delete_mail_tracking_values()
