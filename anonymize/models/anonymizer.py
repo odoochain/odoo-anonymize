@@ -85,7 +85,7 @@ class Anonymizer(models.AbstractModel):
         )
 
     def _delete_mail_tracking_values(self):
-        for field in self.env["ir.model.fields"].search([("anonymize", "=", True)]):
+        for field in self.env["ir.model.fields"].search([("anonymize", "!=", False)]):
             self.env.cr.execute(
                 """
                 delete from mail_tracking_value where field = %s"
@@ -123,7 +123,7 @@ class Anonymizer(models.AbstractModel):
         self._delete_mail_tracking_values()
         self.env["ir.model.fields"]._apply_default_anonymize_fields()
 
-        for field in self.env["ir.model.fields"].search([("anonymize", "=", True)]):
+        for field in self.env["ir.model.fields"].search([("anonymize", "!=", False)]):
             try:
                 obj = self.env[field.model]
             except KeyError:
