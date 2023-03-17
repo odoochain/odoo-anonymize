@@ -3,6 +3,7 @@ import random
 from odoo import _, api, fields, models, SUPERUSER_ID
 from odoo.exceptions import UserError, RedirectWarning, ValidationError
 from .cities import city_names
+from .cities import street_names
 
 
 class Fields(models.Model):
@@ -16,6 +17,20 @@ class Fields(models.Model):
         "yahoo.com",
     ]
 
+    firstnames = [
+        "Jack",
+        "Maria",
+        "Claudia",
+        "Agata",
+        "Angelika",
+        "Bianca",
+        "Franz",
+        "Josef",
+        "Sepp",
+        "Heinrich",
+        "Max",
+        "Kevin",
+    ]
     anonymize = fields.Selection(
         [
             ["clear", "Clear"],
@@ -114,7 +129,11 @@ class Fields(models.Model):
         elif self.anonymize == "phone":
             return self.gen_phone()
         elif self.anonymize == "city":
-            return random.choice(Fields.city_names)
+            return random.choice(city_names)
+        elif self.anonymize == "street":
+            return random.choice(street_names)
+        elif self.anonymize == "firstname":
+            return random.choice(self.firstnames)
         elif self.anonymize == "clear":
             if self.ttype in ["char", "text"]:
                 return ""
