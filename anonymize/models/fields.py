@@ -1,7 +1,9 @@
 from odoo.addons.queue_job.job import job
+import string
 import random
 from odoo import _, api, fields, models, SUPERUSER_ID
 from odoo.exceptions import UserError, RedirectWarning, ValidationError
+from odoo.tools.mail import html2plaintext
 from .cities import city_names
 from .cities import street_names
 
@@ -40,6 +42,8 @@ class Fields(models.Model):
             ["street", "Street"],
             ["phone", "Phone"],
             ["city", "City"],
+            ["email", "Email"],
+            ["lorem_ipsum", "Lorem Ipsum"],
         ],
         "Anonymize",
     )
@@ -117,6 +121,27 @@ class Fields(models.Model):
             + self.get_one_random_domain(self._domains)
         )
 
+    @api.model
+    def lorem_ipsum(self, val):
+        val = html2plaintext(val or "")
+        alphabet = string.ascii_lowercase
+        cipher_dict = {}
+
+        for letter in alphabet:
+            cipher_dict[letter] = random.choice(alphabet)
+            cipher_dict[letter.upper()] = random.choice(alphabet).upper()
+        for digit in string.digits:
+            cipher_dict[digit] = random.choice(string.digits)
+        cipher_dict.update({" ": " "})
+        cipher_dict.update({p: p for p in string.punctuation})
+        for C in "\n\t\l\r":
+            cipher_dict.update({C: C})
+
+        val2 = ""
+        for letter in val:
+            val2 += cipher_dict.get(letter, "")
+        return val2.strip()
+
     def _anonymize_value(self, val):
         import names
 
@@ -134,6 +159,8 @@ class Fields(models.Model):
             return random.choice(street_names)
         elif self.anonymize == "firstname":
             return random.choice(self.firstnames)
+        elif self.anonymize == "lorem_ipsum":
+            return self.lorem_ipsum(val)
         elif self.anonymize == "clear":
             if self.ttype in ["char", "text"]:
                 return ""
