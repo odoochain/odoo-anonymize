@@ -172,3 +172,18 @@ class Fields(models.Model):
                 raise NotImplementedError(self.type)
         else:
             raise NotImplementedError(self.anonymize)
+
+    def write(self, vals):
+        if "anonymize" in vals:
+            anonymize = vals.pop("anonymize")
+            for rec in self:
+                self.env.cr.execute(
+                    "update ir_model_fields set anonymize = %s where id = %s",
+                    (
+                        anonymize,
+                        rec.id,
+                    ),
+                )
+
+        res = super().write(vals)
+        return res
