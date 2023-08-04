@@ -7,7 +7,7 @@
     'demo': [],
     'demo_xml': [],
     'depends': ['base'],
-    'external_dependencies': {'bin': [], 'python': ['names']},
+    'external_dependencies': {'bin': [], 'python': ['names', 'arrow']},
     'installable': True,
     'js': [],
     'name': 'anonymize',
